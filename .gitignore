@@ -138,5 +138,5 @@ dmypy.json
 rental-property-certificate-of-compliance.csv
 
 # VSCode
-.vscode/
+.vscode/settings.json
 *.code-workspace

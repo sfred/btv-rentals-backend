@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Pipeline",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/pipeline/data.py",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: API Server",
+      "type": "python",
+      "request": "launch",
+      "module": "flask",
+      "args": ["run", "--no-debugger", "--no-reload"],
+      "jinja": true
+    }
+  ]
+}
