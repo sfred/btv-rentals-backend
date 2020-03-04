@@ -15,7 +15,7 @@ def main():
         data = pd.read_csv(config['RENTAL_COC_URL'])
         print("Latest CoC data downloaded")
 
-    db.load_schema()
+    db.init_db()
 
     # Drop unneeded columns
     try:
@@ -83,6 +83,18 @@ def main():
     clean_data['StreetAddress'] = clean_data.apply(
         parse_address, axis=1)
 
+    address_df = pd.DataFrame(address_variations, columns=["Address", "Span"])
+    address_df.to_sql(
+        "addresses",
+        con=db.get_engine(),
+        if_exists="replace",
+        method="multi",
+        dtype={
+            'address': String,
+            'span': String
+        }
+    )
+
     clean_data.to_sql(
         "properties",
         con=db.get_engine(),
@@ -105,24 +117,26 @@ def main():
         }
     )
 
-    address_df = pd.DataFrame(address_variations, columns=["Address", "Span"])
-    address_df.to_sql(
-        "addresses",
-        con=db.get_engine(),
-        if_exists="replace",
-        method="multi",
-        dtype={
-            'address': String,
-            'span': String
-        }
-    )
-
     with db.get_engine().connect() as con:
         con.execute('ALTER TABLE "properties" ADD PRIMARY KEY ("Span");')
         con.execute('ALTER TABLE "addresses" ADD PRIMARY KEY ("index");')
-        con.execute(('CREATE INDEX IF NOT EXISTS "addresses_index"'
-                     'ON "public"."addresses"'
+
+        con.execute(('ALTER TABLE "addresses" '
+                     'DROP CONSTRAINT IF EXISTS fkey_Span;'))
+
+        con.execute(('ALTER TABLE "addresses" '
+                     'ADD CONSTRAINT "fkey_Span" '
+                     'FOREIGN KEY ("Span") '
+                     'REFERENCES "public"."properties" ("Span") '
+                     'ON DELETE CASCADE;'))
+
+        con.execute(('CREATE INDEX IF NOT EXISTS "addresses_address_index" '
+                     'ON "public"."addresses" '
                      'USING BTREE ("Address");'))
+
+        con.execute(('CREATE INDEX IF NOT EXISTS "addresses_span_index" '
+                     'ON "public"."addresses" '
+                     'USING BTREE ("Span");'))
 
 
 main()
