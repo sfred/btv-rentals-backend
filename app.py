@@ -1,5 +1,7 @@
 from flask import Flask, request, Response
 from flask_restful import reqparse, Api, Resource
+from utils.config import config
+from waitress import serve
 import json
 
 app = Flask(__name__)
@@ -18,4 +20,8 @@ class Search(Resource):
 api.add_resource(Search, '/search/<term>')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    open('/tmp/app-initialized', 'w').close()
+    if config['FLASK_ENV'] == 'development':
+        app.run()
+    else:
+        serve(app, unix_socket='/tmp/nginx.socket')
