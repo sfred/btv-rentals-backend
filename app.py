@@ -1,27 +1,18 @@
-from flask import Flask, request, Response
-from flask_restful import reqparse, Api, Resource
+from api.search import Search
+from flask import Flask
+from flask_restful import Api
 from utils.config import config
 from waitress import serve
-import json
 
 app = Flask(__name__)
 api = Api(app)
 
-# parser arguments
-parser = reqparse.RequestParser()
-parser.add_argument('term')
-
-# Endpoints
-class Search(Resource):
-    def get(self, term):
-        return {'searched': term}
-
-# Setup the Api resource routing here
+# Resource routing
 api.add_resource(Search, '/search/<term>')
 
 if __name__ == '__main__':
-    open('/tmp/app-initialized', 'w').close()
     if config['FLASK_ENV'] == 'development':
         app.run()
     else:
+        open('/tmp/app-initialized', 'w').close()
         serve(app, unix_socket='/tmp/nginx.socket')

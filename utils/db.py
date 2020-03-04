@@ -1,9 +1,8 @@
-from utils.config import config
 from sqlalchemy import (
     create_engine,
     MetaData
 )
-
+from utils.config import config
 
 _engine = None
 _metadata = None

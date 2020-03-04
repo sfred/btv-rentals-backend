@@ -1,13 +1,9 @@
-from sqlalchemy import Integer, String, Date
 from utils.config import config
-import utils.db as db
-import pandas as pd
-import usaddress
 from scourgify import normalize_address_record
 from scourgify.exceptions import UnParseableAddressError
-
-# Configuration
-RENTAL_COC_URL = "https://data.burlingtonvt.gov/explore/dataset/rental-property-certificate-of-compliance/download/?format=csv&timezone=US/Eastern&lang=en&use_labels_for_header=true&csv_separator=%2C"
+from sqlalchemy import Integer, String, Date
+import pandas as pd
+import utils.db as db
 
 
 def main():
@@ -16,7 +12,8 @@ def main():
             "./pipeline/rental-property-certificate-of-compliance.csv"
         )
     else:
-        data = pd.read_csv(RENTAL_COC_URL)
+        data = pd.read_csv(config['RENTAL_COC_URL'])
+        print("Latest CoC data downloaded")
 
     db.load_schema()
 
@@ -65,18 +62,22 @@ def main():
                     range_high = int(numbers[1])
 
                     for i in range(range_low, range_high + 1):
-                        address_variations.append(
-                            [str(i) + " " + " ".join(address_parts[1:]), row['Span']])
+                        address_variations.append([
+                            str(i) + " " + " ".join(address_parts[1:]),
+                            row['Span']
+                        ])
                 except ValueError:
                     print("Could not parse address number: " +
                           row['StreetAddress'])
             else:
                 address_variations.append(
                     [address['address_line_1'], row['Span']])
+
         except UnParseableAddressError:
             print("Address not normalized due to usaddress parser failing: " +
                   row['StreetAddress'])
             return ""
+
         return address['address_line_1']
 
     clean_data['StreetAddress'] = clean_data.apply(
@@ -119,7 +120,9 @@ def main():
     with db.get_engine().connect() as con:
         con.execute('ALTER TABLE "properties" ADD PRIMARY KEY ("Span");')
         con.execute('ALTER TABLE "addresses" ADD PRIMARY KEY ("index");')
-        con.execute('CREATE INDEX IF NOT EXISTS "addresses_index" ON "public"."addresses" USING BTREE ("Address");')
+        con.execute(('CREATE INDEX IF NOT EXISTS "addresses_index"'
+                     'ON "public"."addresses"'
+                     'USING BTREE ("Address");'))
 
 
 main()
