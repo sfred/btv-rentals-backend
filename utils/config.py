@@ -13,5 +13,6 @@ config = {
     "FLASK_APP": os.getenv("FLASK_APP"),
     "FLASK_ENV": os.getenv("FLASK_ENV"),
     "FLASK_DEBUG": os.getenv("FLASK_DEBUG"),
+    "REDIS_URL": os.getenv("REDIS_URL"),
     "RENTAL_COC_URL": os.getenv("RENTAL_COC_URL")
 }

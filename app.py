@@ -1,3 +1,4 @@
+from api.cache import cache
 from api.search import Search
 from flask import Flask, make_response
 from flask_restful import Api
@@ -10,6 +11,7 @@ import sys
 
 app = Flask(__name__)
 api = Api(app)
+cache.init_app(app)
 
 # Resource routing
 api.add_resource(Search, '/search/<term>')
