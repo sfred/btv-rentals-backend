@@ -40,4 +40,4 @@ class Search(Resource):
         if len(properties) == 0:
             return {'error': 'No results found'}, 404
         else:
-            return {'properties': properties}
+            return properties
