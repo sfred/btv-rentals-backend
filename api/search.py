@@ -31,7 +31,7 @@ class Search(Resource):
         query = session.query(properties) \
             .join(addresses, addresses.c.Span == properties.c.Span) \
             .filter(addresses.c.Address == term) \
-            .order_by(properties.c.Address.desc()) \
+            .order_by(properties.c.StreetAddress.desc()) \
             .order_by(properties.c.UnitNumber.desc()) \
             .all()
 
