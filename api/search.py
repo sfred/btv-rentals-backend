@@ -31,16 +31,13 @@ class Search(Resource):
         query = session.query(properties) \
             .join(addresses, addresses.c.Span == properties.c.Span) \
             .filter(addresses.c.Address == term) \
+            .order_by(properties.c.Address.desc()) \
+            .order_by(properties.c.UnitNumber.desc()) \
             .all()
 
         properties = []
         for row in query:
             properties.append(dict(row._asdict()))
-
-
-        # sorting by UnitNumber
-        properties = sorted(properties, key = lambda i: i['UnitNumber'])
-
 
         if len(properties) == 0:
             return {'error': 'No results found'}, 404
