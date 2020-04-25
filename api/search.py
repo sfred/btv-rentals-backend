@@ -28,11 +28,13 @@ class Search(Resource):
 
         session = db.create_session()
 
+        # Querying with match filter and result sorting;
+        # Results are sorted first by Street Address then by UnitNumber, if it exists.
         query = session.query(properties) \
             .join(addresses, addresses.c.Span == properties.c.Span) \
             .filter(addresses.c.Address == term) \
-            .order_by(properties.c.StreetAddress.desc()) \
-            .order_by(properties.c.UnitNumber.desc()) \
+            .order_by(properties.c.StreetAddress.asc()) \
+            .order_by(properties.c.UnitNumber.asc()) \
             .all()
 
         properties = []
