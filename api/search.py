@@ -37,6 +37,11 @@ class Search(Resource):
         for row in query:
             properties.append(dict(row._asdict()))
 
+
+        # sorting by UnitNumber
+        properties = sorted(properties, key = lambda i: i['UnitNumber'])
+
+
         if len(properties) == 0:
             return {'error': 'No results found'}, 404
         else:
